@@ -7,3 +7,4 @@ baseline/*.json
 
 # IDE
 .idea/
+docker-compose.override.yml
