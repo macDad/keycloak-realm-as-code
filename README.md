@@ -177,3 +177,4 @@ Run `docker compose up -d` followed by `docker compose run --rm config` before o
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
