@@ -117,6 +117,8 @@ chmod +x .git/hooks/pre-commit
 
 `baseline/prod-export.json` is gitignored by default — it's written by a separate scheduled job with production credentials, refreshed regularly rather than checked in by hand. See [baseline/README.md](baseline/README.md) for what generates it and how to refresh it yourself. Wire that job up before this workflow can run in a fork.
 
+This repo's own committed baseline predates the `passwordPolicy` hardening above (it was captured while the minimum length was still `12`) — so any pull request against the current `realms/demo` config reproduces the gate's actual payoff: the job diff comes back showing that one line changed, not the whole realm.
+
 ## Realm comparison
 
 ```bash
