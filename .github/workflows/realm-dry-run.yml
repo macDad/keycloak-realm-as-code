@@ -6,21 +6,31 @@ on: [pull_request]
 jobs:
   dry-run:
     runs-on: ubuntu-latest
-    services:
-      keycloak:
-        image: quay.io/keycloak/keycloak:26.5.5
-        env:
-          KC_BOOTSTRAP_ADMIN_USERNAME: admin
-          KC_BOOTSTRAP_ADMIN_PASSWORD: admin
-        ports: ["8080:8080"]
-        options: >-
-          --health-cmd "exec 3<>/dev/tcp/127.0.0.1/9000 &&
-            echo -e 'GET /health/ready HTTP/1.1\nhost: localhost\n' >&3 &&
-            timeout 2 cat <&3 | grep -q '200 OK'"
-          --health-interval 10s --health-retries 20
-
     steps:
       - uses: actions/checkout@v4
+
+      - name: Start Keycloak
+        run: |
+          docker run -d --name keycloak \
+            -p 8080:8080 -p 9000:9000 \
+            -e KC_BOOTSTRAP_ADMIN_USERNAME=admin \
+            -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin \
+            -e KC_HEALTH_ENABLED=true \
+            quay.io/keycloak/keycloak:26.5.5 start-dev
+
+      - name: Wait for Keycloak
+        run: |
+          for i in $(seq 1 24); do
+            if curl -sf http://localhost:9000/health/ready > /dev/null; then
+              echo "Keycloak is ready"
+              exit 0
+            fi
+            echo "Waiting for Keycloak ($i/24)..."
+            sleep 5
+          done
+          echo "Keycloak did not become healthy in time"
+          docker logs keycloak
+          exit 1
 
       - name: Load production baseline
         run: ./scripts/apply.sh baseline/prod-export.json
