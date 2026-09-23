@@ -8,7 +8,7 @@ loginWithEmailAllowed: true
 registrationAllowed: false
 resetPasswordAllowed: true
 
-passwordPolicy: "length(12) and notUsername and passwordHistory(3)"
+passwordPolicy: "length(14) and notUsername and passwordHistory(3)"
 
 bruteForceProtected: true
 failureFactor: 10
