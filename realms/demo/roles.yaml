@@ -1,0 +1,8 @@
+# realms/demo/roles.yaml
+realm: demo
+roles:
+  realm:
+    - name: dispatcher
+      description: Can assign and reassign jobs
+    - name: viewer
+      description: Read-only access

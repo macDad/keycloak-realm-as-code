@@ -1,0 +1,45 @@
+# .github/workflows/realm-dry-run.yml
+name: Realm dry run
+
+on: [pull_request]
+
+jobs:
+  dry-run:
+    runs-on: ubuntu-latest
+    services:
+      keycloak:
+        image: quay.io/keycloak/keycloak:26.5.5
+        env:
+          KC_BOOTSTRAP_ADMIN_USERNAME: admin
+          KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+        ports: ["8080:8080"]
+        options: >-
+          --health-cmd "exec 3<>/dev/tcp/127.0.0.1/9000 &&
+            echo -e 'GET /health/ready HTTP/1.1\nhost: localhost\n' >&3 &&
+            timeout 2 cat <&3 | grep -q '200 OK'"
+          --health-interval 10s --health-retries 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Load production baseline
+        run: ./scripts/apply.sh baseline/prod-export.json
+
+      - name: Snapshot before
+        run: ./scripts/export-normalised.sh > /tmp/before.json
+
+      - name: Apply PR config
+        env:
+          APP_BASE_URL: https://app.example.com
+          BACKEND_CLIENT_SECRET: ci-placeholder-secret
+        run: ./scripts/apply.sh realms/demo
+
+      - name: Snapshot after
+        run: ./scripts/export-normalised.sh > /tmp/after.json
+
+      - name: Diff
+        run: |
+          if ! diff -u /tmp/before.json /tmp/after.json > /tmp/realm.diff; then
+            echo "Realm changes in this PR:"
+            cat /tmp/realm.diff
+          fi

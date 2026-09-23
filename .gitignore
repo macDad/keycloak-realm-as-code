@@ -1,0 +1,9 @@
+# Real per-environment secrets — only dev.env (throwaway values) is committed
+env/*.env
+!env/dev.env
+
+# Production realm baseline — populated by a scheduled job, not committed by hand
+baseline/*.json
+
+# IDE
+.idea/

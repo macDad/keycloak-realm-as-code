@@ -1,0 +1,21 @@
+# realms/demo/clients.yaml
+realm: demo
+clients:
+  - clientId: demo-web
+    name: Demo Web App
+    enabled: true
+    protocol: openid-connect
+    publicClient: true
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: false
+    redirectUris:
+      - "$(env:APP_BASE_URL)/*"
+    webOrigins:
+      - "$(env:APP_BASE_URL)"
+    attributes:
+      pkce.code.challenge.method: S256
+
+  - clientId: backend-service
+    secret: "$(env:BACKEND_CLIENT_SECRET)"
+    serviceAccountsEnabled: true
+    publicClient: false
