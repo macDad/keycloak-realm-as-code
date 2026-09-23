@@ -115,7 +115,7 @@ chmod +x .git/hooks/pre-commit
 
 `.github/workflows/realm-dry-run.yml` runs on every pull request: it starts a throwaway Keycloak, loads `baseline/prod-export.json` with `scripts/apply.sh`, snapshots it with `scripts/export-normalised.sh`, applies the PR's `realms/demo` config on top, snapshots again, and diffs the two. Any change the PR didn't declare shows up in the job log — a realm-terms diff, not a YAML-terms one, which is a different and more useful artifact than the file diff GitHub already shows.
 
-`baseline/prod-export.json` isn't committed to this repo — it's written by a separate scheduled job with production credentials, refreshed regularly rather than checked in by hand. See [baseline/README.md](baseline/README.md). Wire that job up before this workflow can run in a fork.
+`baseline/prod-export.json` is gitignored by default — it's written by a separate scheduled job with production credentials, refreshed regularly rather than checked in by hand. See [baseline/README.md](baseline/README.md) for what generates it and how to refresh it yourself. Wire that job up before this workflow can run in a fork.
 
 ## Realm comparison
 
